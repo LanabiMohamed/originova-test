@@ -1,4 +1,13 @@
 <template>
+  <v-snackbar v-model="snackbar">
+    <span>{{ snackbarText }}</span>
+
+    <template v-slot:actions>
+      <v-btn color="pink" variant="text" @click="snackbar = false">
+        Close
+      </v-btn>
+    </template>
+  </v-snackbar>
   <v-dialog v-model="dialog" max-width="500px">
     <template v-slot:activator="{ props }">
       <v-btn class="mb-2" color="primary" dark v-bind="props"> New Item </v-btn>
@@ -53,6 +62,8 @@
 export default {
   data() {
     return {
+      snackbarText: "",
+      snackbar: false,
       valid: false,
       dialog: false,
       loadingAdd: false,
@@ -76,11 +87,21 @@ export default {
           "Content-Type": "application/json",
         },
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error Adding item");
+          }
+          response.json();
+        })
         .then((json) => {
           this.$emit("HanldeSave", { ...this.item, ...json });
           this.loadingAdd = false;
           this.close();
+        })
+        .catch((error) => {
+          this.snackbarText = "Error Adding item";
+          this.snackbar = true;
+          this.loadingAdd = false;
         });
     },
 

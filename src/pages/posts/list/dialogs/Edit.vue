@@ -1,4 +1,13 @@
 <template>
+  <v-snackbar v-model="snackbar">
+    <span>{{ snackbarText }}</span>
+
+    <template v-slot:actions>
+      <v-btn color="pink" variant="text" @click="snackbar = false">
+        Close
+      </v-btn>
+    </template>
+  </v-snackbar>
   <v-dialog v-model="dialog" max-width="1200">
     <template v-slot:default="{ isActive }">
       <v-card>
@@ -59,6 +68,8 @@ export default {
   },
   data() {
     return {
+      snackbarText: "",
+      snackbar: false,
       newItem: {
         title: "",
         body: "",
@@ -86,11 +97,20 @@ export default {
             "Content-Type": "application/json",
           },
         }
-      ).then(() => {
-        this.$emit("HanldeUpdate", this.newItem);
-        this.loading = false;
-        this.close();
-      });
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error updating item");
+          }
+          this.$emit("HanldeUpdate", this.newItem);
+          this.loading = false;
+          this.close();
+        })
+        .catch((error) => {
+          this.snackbarText = "Error updating item";
+          this.snackbar = true;
+          this.loading = false;
+        });
     },
   },
   watch: {

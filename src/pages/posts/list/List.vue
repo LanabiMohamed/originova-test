@@ -1,11 +1,26 @@
 <template>
+  <v-snackbar v-model="snackbar">
+    <span>{{ snackbarText }}</span>
+
+    <template v-slot:actions>
+      <v-btn color="pink" variant="text" @click="snackbar = false">
+        Close
+      </v-btn>
+    </template>
+  </v-snackbar>
   <v-data-table :headers="headers" :items="serverItems" :loading="loading">
     <template v-slot:top>
       <v-toolbar flat>
         <v-toolbar-title>My CRUD</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
-        <Add @HanldeSave="(item) => serverItems.unshift(item)" />
+        <Add
+          @HanldeSave="
+            (item) => {
+              serverItems.unshift(item);
+            }
+          "
+        />
         <Edit
           :dialogEdit="dialogEdit"
           :editedItem="editedItem"
@@ -63,6 +78,8 @@ export default {
     Edit,
   },
   data: () => ({
+    snackbarText: "",
+    snackbar: false,
     dialogEdit: false,
     dialogDelete: false,
     loadingDelete: false,
@@ -100,15 +117,18 @@ export default {
           method: "DELETE",
         }
       )
-        .then(() => {
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error deleting item");
+          }
           this.serverItems.splice(this.editedIndex, 1);
+          this.loadingDelete = false;
           this.closeDelete();
         })
-        .finally(() => {
-          this.loadingDelete = false;
-        })
         .catch(() => {
-          alert("An error occurred. Please try again later.");
+          this.snackbarText = "Error deleting item";
+          this.snackbar = true;
+          this.loadingDelete = false;
         });
     },
 
@@ -119,9 +139,19 @@ export default {
     loadItems() {
       this.loading = true;
       fetch("https://jsonplaceholder.typicode.com/posts")
-        .then((response) => response.json())
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error fetching items");
+          }
+          return response.json();
+        })
         .then((json) => {
           this.serverItems = json;
+          this.loading = false;
+        })
+        .catch(() => {
+          this.snackbarText = "Error fetching items";
+          this.snackbar = true;
           this.loading = false;
         });
     },

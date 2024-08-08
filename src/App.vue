@@ -1,23 +1,33 @@
 <template>
   <v-app theme="dark">
     <main class="main--container">
-      <aside class="dashboard">
+      <aside class="dashboard border border-red-500 bg-red-500">
         <v-list-item
-          v-for="n in [
-            { title: 'Originova', link: '/' },
-            { title: 'Posts', link: '/posts' },
-            { title: 'News', link: '/news' },
-            { title: 'About', link: '/about' },
-          ]"
+          v-for="n in navs"
           :key="n.title"
           :title="n.title"
-          :href="n.link"
+          :to="n.link"
         ></v-list-item>
       </aside>
       <router-view />
     </main>
   </v-app>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      navs: [
+        { title: "Originova", link: "/" },
+        { title: "Posts", link: "/posts" },
+        { title: "News", link: "/news" },
+        { title: "About", link: "/about" },
+      ],
+    };
+  },
+};
+</script>
 
 <style scoped>
 .main--container {
