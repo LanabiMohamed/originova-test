@@ -38,7 +38,7 @@ export default {
   padding: 1rem;
   color: black;
   background-color: #b9babb;
-  width: 15rem;
+  min-width: 15rem;
   height: 100%;
   border-radius: 0px 30px 30px 0px;
   box-shadow: 0px 0px 5px 0px #2f2f2f;
