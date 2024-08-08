@@ -193,7 +193,7 @@ export default {
       fetch(Url)
         .then((response) => response.json())
         .then((json) => {
-          this.sources = json.sources.slice(0, 5).map((item) => ({
+          this.sources = json.sources.map((item) => ({
             title: item.name,
             id: item.id,
           }));
